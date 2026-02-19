@@ -1527,7 +1527,10 @@
         </div>
       </div>
       <div class="demo-body">
-        <div class="upload-area" onclick="simulateScan()">
+        <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+          <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="uploadImage(this)">
+
+
           <div class="upload-icon" id="uploadIcon">📸</div>
           <div class="upload-text" id="uploadText">Tap to take photo or upload</div>
           <div class="upload-sub" id="uploadSub">JPG, PNG supported · Works in low bandwidth</div>
@@ -2241,37 +2244,6 @@
     }, 1000);
   }
 
-  // ===== SCAN SIMULATION =====
-  let scanning = false;
-  function simulateScan() {
-    if (scanning) return;
-    scanning = true;
-    const icon = document.getElementById('uploadIcon');
-    const text = document.getElementById('uploadText');
-    const sub = document.getElementById('uploadSub');
-    const steps = [
-      {icon:'📤', text:'Uploading image...', sub:'Compressing for low bandwidth · Please wait'},
-      {icon:'🤖', text:'AI model analyzing...', sub:'GoogleNet + YOLOv5 processing crop image'},
-      {icon:'🔬', text:'Identifying disease...', sub:'Cross-referencing disease database · 89% match'},
-      {icon:'✅', text:'Early Blight Detected!', sub:'Alternaria solani · Treatment plan ready below'},
-    ];
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < steps.length) {
-        icon.textContent = steps[i].icon;
-        text.textContent = steps[i].text;
-        sub.textContent = steps[i].sub;
-        i++;
-      } else {
-        clearInterval(interval);
-        scanning = false;
-        showToast('🔬 Early Blight detected! 7-Day plan is ready — scroll to see it.');
-        setTimeout(() => {
-          document.getElementById('plan').scrollIntoView({behavior:'smooth'});
-        }, 1500);
-      }
-    }, 700);
-  }
 
   // ===== 7-DAY PLAN =====
   const dayData = [
@@ -2405,6 +2377,45 @@
     selectDay(1);
   });
 </script>
+const API_URL = "https://maritza-quailike-signe.ngrok-free.dev/predict";
+const API_KEY = "SANJEEVNI-ML-9F3A2C7B";
+
+async function uploadImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  document.getElementById("uploadIcon").textContent = "🤖";
+  document.getElementById("uploadText").textContent = "Analyzing crop...";
+  document.getElementById("uploadSub").textContent = "Sending image to AI model";
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "x-api-key": API_KEY
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    document.getElementById("uploadIcon").textContent = "✅";
+    document.getElementById("uploadText").textContent = data.disease || "Prediction Done";
+    document.getElementById("uploadSub").textContent =
+      "Confidence: " + (data.confidence * 100).toFixed(1) + "%";
+
+    showToast("🌾 Disease detected successfully!");
+
+  } catch (err) {
+    console.error(err);
+    showToast("❌ ML server not reachable");
+  }
+}
 
 </body>
 </html>
