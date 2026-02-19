@@ -2376,7 +2376,8 @@
   window.addEventListener('load', () => {
     selectDay(1);
   });
-</script>
+  // ===== REAL ML CONNECTION =====
+
 const API_URL = "https://maritza-quailike-signe.ngrok-free.dev/predict";
 const API_KEY = "SANJEEVNI-ML-9F3A2C7B";
 
@@ -2401,13 +2402,12 @@ async function uploadImage(input) {
     });
 
     const data = await res.json();
-
     console.log(data);
 
     document.getElementById("uploadIcon").textContent = "✅";
-    document.getElementById("uploadText").textContent = data.disease || "Prediction Done";
+    document.getElementById("uploadText").textContent = data.prediction;
     document.getElementById("uploadSub").textContent =
-      "Confidence: " + (data.confidence * 100).toFixed(1) + "%";
+      "Confidence: " + data.confidence + "%";
 
     showToast("🌾 Disease detected successfully!");
 
@@ -2416,6 +2416,9 @@ async function uploadImage(input) {
     showToast("❌ ML server not reachable");
   }
 }
+
+</script>
+
 
 </body>
 </html>
