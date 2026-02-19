@@ -2372,12 +2372,13 @@
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  // Select day 1 by default on load
-  window.addEventListener('load', () => {
-    selectDay(1);
-  });
-  // ===== REAL ML CONNECTION =====
+ <script>
 
+window.addEventListener('load', () => {
+  selectDay(1);
+});
+
+// ===== REAL ML CONNECTION =====
 const API_URL = "https://maritza-quailike-signe.ngrok-free.dev/predict";
 const API_KEY = "SANJEEVNI-ML-9F3A2C7B";
 
@@ -2402,7 +2403,6 @@ async function uploadImage(input) {
     });
 
     const data = await res.json();
-    console.log(data);
 
     document.getElementById("uploadIcon").textContent = "✅";
     document.getElementById("uploadText").textContent = data.prediction;
@@ -2418,7 +2418,6 @@ async function uploadImage(input) {
 }
 
 </script>
-
-
 </body>
 </html>
+
